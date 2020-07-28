@@ -5,9 +5,9 @@
 
 # csv-dataset
 
-`CsvDataset` helps to read csv files and create descriptive and efficient input pipelines for deep learning.
+`CsvDataset` helps to read a csv file and create descriptive and efficient input pipelines for deep learning.
 
-`CsvDataset` iterates the records of csv files in a streaming fashion, so the full dataset does not need to fit into memory.
+`CsvDataset` iterates the records of the csv file in a streaming fashion, so the full dataset does not need to fit into memory.
 
 ## Install
 

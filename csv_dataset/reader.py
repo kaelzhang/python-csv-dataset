@@ -22,7 +22,7 @@ class ReaderProtocol(Protocol, Generic[T]):
         ...
 
 
-class FileReader(Generic[T]):
+class CsvReader(Generic[T]):
     def __init__(
         self,
         filepath: str,

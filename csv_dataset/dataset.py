@@ -1,6 +1,7 @@
 from typing import (
     Optional,
-    Callable
+    Callable,
+    List
 )
 
 import numpy as np
@@ -20,16 +21,16 @@ def default_mapper(lst: list):
     return np.array(lst)
 
 
-class CsvDataset:
+class Dataset:
     def __init__(
         self,
         reader: ReaderProtocol,
-        column_types: list[Callable],
-        header: bool = False
+        # column_types: List[Callable],
+        # header: bool = False
     ):
         self._reader = reader
-        self._header = header
-        self._column_types = column_types
+        # self._header = header
+        # self._column_types = column_types
         self._line_pointer = 0
 
         self._mapper = default_mapper
@@ -42,8 +43,8 @@ class CsvDataset:
         self._window_stride = 1
         self._window_drop_remainder = False
 
-        if header:
-            self._fd.readline()
+        # if header:
+        #     self._fd.readline()
 
     @lazy
     def _single_size(self) -> int:
@@ -73,7 +74,7 @@ class CsvDataset:
     def map_series(
         self,
         mapper: Mapper
-    ) -> 'CsvDataset':
+    ) -> 'Dataset':
         """Maps `mapper` across each series record of the csv
         """
 
@@ -91,7 +92,7 @@ class CsvDataset:
         shift: Optional[int] = None,
         stride: int = 1,
         drop_remainder: bool = False
-    ) -> 'CsvDataset':
+    ) -> 'Dataset':
         """Combines (nests of) input elements into a dataset of (nests of) windows.
 
         |-------- size:3 --------|
@@ -119,7 +120,7 @@ class CsvDataset:
     def batch(
         self,
         batch: int
-    ) -> 'CsvDataset':
+    ) -> 'Dataset':
         """Combines consecutive elements of this dataset into batches.
         """
 
@@ -164,30 +165,29 @@ class CsvDataset:
             strides=(BYTE_STRIDE, BYTE_STRIDE)
         )
 
-
         self._buffer = self._readlines(buffer, self._stride, True)
 
 
-from pathlib import Path
+# from pathlib import Path
 
-csv_path = Path(Path(__file__).resolve()).parent.parent.parent / \
-    'ostai-compton' / 'ostai' / 'data' / 'binance_1m_2019-12-20 00:00:00.csv'
+# csv_path = Path(Path(__file__).resolve()).parent.parent.parent / \
+#     'ostai-compton' / 'ostai' / 'data' / 'binance_1m_2019-12-20 00:00:00.csv'
 
 
-dataset = CsvDataset(
-    csv_path.absolute(),
-    [
-        int,
-        int,
-        float, float, float, float, float,
-        int,
-        float, float, float, float
-    ],
-    header=True
-)
+# dataset = Dataset(
+#     csv_path.absolute(),
+#     [
+#         int,
+#         int,
+#         float, float, float, float, float,
+#         int,
+#         float, float, float, float
+#     ],
+#     header=True
+# )
 
-print(dataset.get())
-print(dataset.get())
+# print(dataset.get())
+# print(dataset.get())
 
 # f = open(csv_path.absolute(), 'r')
 

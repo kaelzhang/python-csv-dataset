@@ -32,5 +32,5 @@ def rolling_window(
     return np.lib.stride_tricks.as_strided(
         array,
         shape=(steps, size) + array.shape,
-        strides=(item_stride * size, ) + array.stride
+        strides=(item_stride * size, ) + array.strides
     )

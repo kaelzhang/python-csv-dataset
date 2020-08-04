@@ -9,4 +9,10 @@ def test_rolling_window():
         3
     )
 
-    print(result)
+    comparison = result == np.array([
+        np.array([0, 1, 2]),
+        np.array([3, 4, 5]),
+        np.array([6, 7, 8])
+    ])
+
+    assert comparison.all()

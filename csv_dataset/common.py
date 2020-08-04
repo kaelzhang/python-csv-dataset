@@ -21,8 +21,10 @@ def rolling_window(
     window_step = shift * stride
 
     step_length = len(array) - size
-    steps = step_length % window_step
+    steps = step_length // window_step
     rest = step_length - window_step * steps
+
+    steps += 1
 
     if rest:
         # drop the last window should be dropped
@@ -31,6 +33,6 @@ def rolling_window(
 
     return np.lib.stride_tricks.as_strided(
         array,
-        shape=(steps, size) + array.shape,
+        shape=(steps, size) + array.shape[1:],
         strides=(item_stride * size, ) + array.strides
     )

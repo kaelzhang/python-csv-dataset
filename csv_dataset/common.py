@@ -16,8 +16,6 @@ def rolling_window(
 
     shift = shift or size
 
-    item_stride = array.strides[0]
-
     window_step = shift * stride
 
     step_length = len(array) - size
@@ -31,8 +29,12 @@ def rolling_window(
         # if its size is smaller than size.
         array = array[:-rest]
 
-    return np.lib.stride_tricks.as_strided(
+    item_stride = array.strides[0]
+
+    ret = np.lib.stride_tricks.as_strided(
         array,
         shape=(steps, size) + array.shape[1:],
-        strides=(item_stride * size, ) + array.strides
+        strides=(item_stride * shift, item_stride * stride) + array.strides[1:]
     )
+
+    return ret

@@ -1,7 +1,7 @@
 from typing import (
     Optional,
     Callable,
-    List
+    # List
 )
 
 import numpy as np
@@ -9,6 +9,7 @@ import numpy as np
 from common_decorators import lazy
 
 from .reader import ReaderProtocol
+from .common import rolling_window
 
 
 Mapper = Callable[[list], list]
@@ -36,19 +37,25 @@ class Dataset:
         self._mapper = default_mapper
         self._batch = 1
 
-        self._reshapes = []
-
         self._window_size = 1
-        self._window_shift = None
+        self._window_shift = 1
         self._window_stride = 1
         self._window_drop_remainder = False
 
-        # if header:
-        #     self._fd.readline()
+    # |-------- size:3 --------|
+    # |- stride:1 -|           |
+    # |            |           |
+    # 1            2           3 --------|---
+    #                                 shift:2
+    # 3            4           5 --------|---
 
+    # 5            6           7
+
+    # least: (size - 1) * stride + 1
+    # step : shift * stride
     @lazy
-    def _single_size(self) -> int:
-        """Size of the underlying datum referred to a single window
+    def _single_least(self) -> int:
+        """The list size of the underlying datum referred to a single window
         """
 
         return (self._window_size - 1) * self._window_stride + 1
@@ -60,16 +67,16 @@ class Dataset:
         return self._window_shift * self._window_stride
 
     @lazy
-    def _size(self) -> int:
-        return self._single_size + (self._batch - 1) * self._single_stride
+    def _least(self) -> int:
+        return self._single_least + (self._batch - 1) * self._single_step
 
     @lazy
     def _step(self) -> int:
-        return self._batch * self._single_stride
+        return self._batch * self._single_step
 
     @lazy
     def _buffer(self):
-        return self._readlines(self._size, [])
+        return self._readlines(self._least, [])
 
     def map_series(
         self,
@@ -90,22 +97,9 @@ class Dataset:
         self,
         window_size: int,
         shift: Optional[int] = None,
-        stride: int = 1,
-        drop_remainder: bool = False
+        stride: int = 1
     ) -> 'Dataset':
         """Combines (nests of) input elements into a dataset of (nests of) windows.
-
-        |-------- size:3 --------|
-        |- stride:1 -|           |
-        |            |           |
-        1            2           3 --------|---
-                                        shift:2
-        3            4           5 --------|---
-
-        5            6           7
-
-        least: (size - 1) * stride + 1
-        step : shift * stride
         """
 
         self._check_start('window')
@@ -113,7 +107,6 @@ class Dataset:
         self._window_size = window_size
         self._window_shift = shift or window_size
         self._window_stride = stride
-        self._drop_remainder = drop_remainder
 
         return self
 
@@ -139,11 +132,11 @@ class Dataset:
         read = 0
 
         while read < lines:
-            dest_buffer.append(self._readline())
+            dest_buffer.append(self._reader.readline())
             read += 1
 
         if slice_size:
-            dest_buffer = dest_buffer.slice(read)
+            dest_buffer = dest_buffer[lines:]
 
         return dest_buffer
 
@@ -156,44 +149,18 @@ class Dataset:
 
         array = np.array(buffer)
 
-        windowed = np.lib.stride_tricks.as_strided(
+        windowed = array if self._window_size == 1 else rolling_window(
             array,
-            shape=(
-                len(array) - self._window_size + 1,
-                period
-            ),
-            strides=(BYTE_STRIDE, BYTE_STRIDE)
+            self._window_size,
+            shift=self._window_shift,
+            stride=self._window_stride
         )
 
-        self._buffer = self._readlines(buffer, self._stride, True)
+        batched = windowed if self._batch == 1 else rolling_window(
+            windowed,
+            self._batch
+        )
 
+        self._buffer = self._readlines(self._step, buffer, True)
 
-# from pathlib import Path
-
-# csv_path = Path(Path(__file__).resolve()).parent.parent.parent / \
-#     'ostai-compton' / 'ostai' / 'data' / 'binance_1m_2019-12-20 00:00:00.csv'
-
-
-# dataset = Dataset(
-#     csv_path.absolute(),
-#     [
-#         int,
-#         int,
-#         float, float, float, float, float,
-#         int,
-#         float, float, float, float
-#     ],
-#     header=True
-# )
-
-# print(dataset.get())
-# print(dataset.get())
-
-# f = open(csv_path.absolute(), 'r')
-
-# lines = f.readlines()
-
-# print(lines)
-
-# for line in lines:
-#     print(line)
+        return batched

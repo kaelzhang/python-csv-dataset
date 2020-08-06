@@ -1,31 +1,32 @@
 from typing import (
     Optional,
-    Callable,
-    # List
+    # Callable,
+    List,
+    TypeVar,
+    Generic
 )
 
 import numpy as np
 
 from common_decorators import lazy
 
-from .reader import ReaderProtocol
+from .reader import AbstractReader
 from .common import rolling_window
 
 
-Mapper = Callable[[list], list]
+# Mapper = Callable[[list], list]
 
-# numpy stride for float is 8
-BYTE_STRIDE = 8
+T = TypeVar('T')
 
 
 def default_mapper(lst: list):
     return np.array(lst)
 
 
-class Dataset:
+class Dataset(Generic[T]):
     def __init__(
         self,
-        reader: ReaderProtocol,
+        reader: AbstractReader[T],
         # column_types: List[Callable],
         # header: bool = False
     ):
@@ -34,7 +35,7 @@ class Dataset:
         # self._column_types = column_types
         self._line_pointer = 0
 
-        self._mapper = default_mapper
+        # self._mapper = default_mapper
         self._batch = 1
 
         self._window_size = 1
@@ -75,19 +76,19 @@ class Dataset:
         return self._batch * self._single_step
 
     @lazy
-    def _buffer(self):
+    def _buffer(self) -> List[List[T]]:
         return self._readlines(self._least, [])
 
-    def map_series(
-        self,
-        mapper: Mapper
-    ) -> 'Dataset':
-        """Maps `mapper` across each series record of the csv
-        """
+    # def map_series(
+    #     self,
+    #     mapper: Mapper
+    # ) -> 'Dataset':
+    #     """Maps `mapper` across each series record of the csv
+    #     """
 
-        self._mapper = mapper
+    #     self._mapper = mapper
 
-        return self
+    #     return self
 
     def _check_start(self, method_name: str):
         if self._line_pointer != 0:

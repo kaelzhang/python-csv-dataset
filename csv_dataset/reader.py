@@ -1,9 +1,12 @@
 from typing import (
-    Protocol,
     List,
     Generic,
     TypeVar,
     Type
+)
+from abc import (
+    ABC,
+    abstractmethod
 )
 
 from common_decorators import lazy
@@ -13,16 +16,17 @@ SPLITTER = ','
 T = TypeVar('T', float, int)
 
 
-class ReaderProtocol(Protocol, Generic[T]):
+class AbstractReader(ABC, Generic[T]):
     dtype: Type[T]
 
+    @abstractmethod
     def readline(self) -> List[T]:
         """Reads a single line and returns the content
         """
         ...
 
 
-class CsvReader(Generic[T]):
+class CsvReader(AbstractReader[T]):
     def __init__(
         self,
         filepath: str,

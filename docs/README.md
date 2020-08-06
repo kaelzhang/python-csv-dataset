@@ -31,16 +31,18 @@ open_time,open,high,low,close,volume
 ```
 
 ```py
-from csv_dataset import CsvDataset
+from csv_dataset import (
+    Dataset,
+    CsvReader
+)
 
 dataset = CsvDataset(
-    filepath,
-    # The types of each column
-    [
-        int,
-        float, float, float, float,
-        float
-    ]
+    CsvReader(
+        filepath,
+        float,
+        indexes=[1, 2, 3, 4, 5],
+        header=True
+    )
 )
 
 for element in dataset:

@@ -2,7 +2,8 @@ from typing import (
     List,
     Generic,
     TypeVar,
-    Type
+    Type,
+    Optional
 )
 from abc import (
     ABC,
@@ -50,8 +51,11 @@ class CsvReader(AbstractReader[T]):
     def _readline(self) -> str:
         return self._fd.readline()
 
-    def readline(self) -> List[T]:
+    def readline(self) -> Optional[List[T]]:
         line = self._readline()
+
+        if not line:
+            return
 
         return [
             self.dtype(cell)

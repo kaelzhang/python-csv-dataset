@@ -133,7 +133,13 @@ class Dataset(Generic[T]):
         read = 0
 
         while read < lines:
-            dest_buffer.append(self._reader.readline())
+            line = self._reader.readline()
+
+            if line is None:
+                # Reaches EOF
+                return []
+
+            dest_buffer.append(line)
             read += 1
 
         if slice_size:
@@ -160,7 +166,7 @@ class Dataset(Generic[T]):
         batched = windowed if self._batch == 1 else rolling_window(
             windowed,
             self._batch
-        )
+        )[0]
 
         self._buffer = self._readlines(self._step, buffer, True)
 

@@ -20,5 +20,11 @@ def test_main():
         )
     ).window(5, 1).batch(5)
 
-    print(dataset.get())
-    print(dataset.get())
+    data = dataset.get()
+
+    assert len(data) == 5
+    assert len(data[0]) == 5
+
+    # while data is not None:
+    #     print(data, len(data))
+    #     data = dataset.get()

@@ -167,11 +167,11 @@ class Dataset(Generic[T]):
         batched = windowed if self._batch == 1 else rolling_window(
             windowed,
             self._batch
-        )[0]
+        )
 
         self._buffer = self._readlines(self._step, buffer, True)
 
-        return batched
+        return batched[0]
 
     def __iter__(self) -> 'Dataset':
         return self

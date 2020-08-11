@@ -1,4 +1,6 @@
 from pathlib import Path
+import pytest
+
 from csv_dataset import (
     CsvReader,
     Dataset
@@ -22,6 +24,12 @@ def test_main():
 
     data = dataset.get()
 
+    with pytest.raises(
+        RuntimeError,
+        match='forbidden'
+    ):
+        dataset.window(5, 2)
+
     assert len(data) == 5
     assert len(data[0]) == 5
     assert data[0][0][0] == 7145.99
@@ -30,3 +38,20 @@ def test_main():
 
     data = dataset.get()
     assert data[0][0][0] == 7134.99
+
+
+def test_iterator():
+    dataset = Dataset(
+        CsvReader(
+            csv_path.absolute(),
+            float,
+            [
+                2, 3, 4, 5, 6
+            ],
+            header=True
+        )
+    ).window(5, 1).batch(5)
+
+    all_data = list(dataset)
+
+    assert len(all_data) == 19

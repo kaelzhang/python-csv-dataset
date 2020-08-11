@@ -19,8 +19,8 @@ from .common import rolling_window
 T = TypeVar('T')
 
 
-def default_mapper(lst: list):
-    return np.array(lst)
+# def default_mapper(lst: list):
+#     return np.array(lst)
 
 
 class Dataset(Generic[T]):
@@ -140,6 +140,7 @@ class Dataset(Generic[T]):
                 return []
 
             dest_buffer.append(line)
+            self._line_pointer += 1
             read += 1
 
         if slice_size:

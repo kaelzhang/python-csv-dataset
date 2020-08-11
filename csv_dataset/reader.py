@@ -24,7 +24,7 @@ class AbstractReader(ABC, Generic[T]):
     def readline(self) -> List[T]:
         """Reads a single line and returns the content
         """
-        ...
+        ...  # pragma: no cover
 
 
 class CsvReader(AbstractReader[T]):

@@ -49,9 +49,9 @@ class Dataset(Generic[T]):
     # 1            2           3 --------|---
     #                                 shift:2
     # 3            4           5 --------|---
-
+    #
     # 5            6           7
-
+    #
     # least: (size - 1) * stride + 1
     # step : shift * stride
     @lazy
@@ -171,3 +171,14 @@ class Dataset(Generic[T]):
         self._buffer = self._readlines(self._step, buffer, True)
 
         return batched
+
+    def __iter__(self) -> 'Dataset':
+        return self
+
+    def __next__(self) -> np.ndarray:
+        got = self.get()
+
+        if got is None:
+            raise StopIteration
+
+        return got

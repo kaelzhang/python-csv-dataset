@@ -24,7 +24,9 @@ def test_main():
 
     assert len(data) == 5
     assert len(data[0]) == 5
+    assert data[0][0][0] == 7145.99
+    assert data[0][1][0] == 7142.89
+    assert data[1][0][0] == 7142.89
 
-    # while data is not None:
-    #     print(data, len(data))
-    #     data = dataset.get()
+    data = dataset.get()
+    assert data[0][0][0] == 7134.99

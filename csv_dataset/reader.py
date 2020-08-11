@@ -49,7 +49,7 @@ class CsvReader(AbstractReader[T]):
         return open(self._filepath, 'r')
 
     def _readline(self) -> str:
-        return self._fd.readline()
+        return self._fd.readline().strip()
 
     def readline(self) -> Optional[List[T]]:
         line = self._readline()
@@ -57,8 +57,10 @@ class CsvReader(AbstractReader[T]):
         if not line:
             return
 
+        splitted = line.split(self._splitter)
+
         return [
             self.dtype(cell)
-            for i, cell in enumerate(line.split(self._splitter))
+            for i, cell in enumerate(splitted)
             if i in self._indexes
         ]

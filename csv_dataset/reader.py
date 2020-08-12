@@ -59,8 +59,11 @@ class CsvReader(AbstractReader[T]):
 
         splitted = line.split(self._splitter)
 
-        return [
-            self.dtype(cell)
-            for i, cell in enumerate(splitted)
-            if i in self._indexes
-        ]
+        try:
+            return [
+                self.dtype(cell)
+                for i, cell in enumerate(splitted)
+                if i in self._indexes
+            ]
+        except ValueError:
+            return self.readline()

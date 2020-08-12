@@ -3,7 +3,8 @@ import pytest
 
 from csv_dataset import (
     CsvReader,
-    Dataset
+    Dataset,
+    RangeNormalizer
 )
 
 csv_path = Path(Path(__file__).resolve()).parent.parent / \
@@ -52,9 +53,10 @@ def test_iterator():
         )
     ).window(5, 1).batch(5)
 
-    all_data = list(dataset)
+    assert len(list(dataset)) == 19
 
-    assert len(all_data) == 19
+    dataset.reset()
+    assert len(list(dataset)) == 19
 
 
 def test_direct_get():
@@ -109,3 +111,44 @@ def test_batch_only():
 
     assert got[0][0] == 7145.99
     assert got[1][0] == 7142.89
+
+
+def test_reader_with_normalizers():
+    price_normalizer = RangeNormalizer(0, 10000)
+    volume_normalizer = RangeNormalizer(0, 200)
+
+    dataset = Dataset(
+        CsvReader(
+            csv_path.absolute(),
+            float,
+            [
+                2, 3, 4, 5, 6
+            ],
+            normalizers=[
+                price_normalizer,
+                price_normalizer,
+                price_normalizer,
+                price_normalizer,
+                volume_normalizer
+            ],
+            header=True
+        )
+    ).batch(5)
+
+    got = dataset.get()
+
+    assert format(got[0][0], '.6f') == '0.714599'
+    assert format(got[1][0], '.6f') == '0.714289'
+
+
+def test_reader_error():
+    with pytest.raises(
+        ValueError,
+        match='expect 5 but got 2'
+    ):
+        CsvReader(
+            'fake',
+            float,
+            indexes=[1, 2, 3, 4, 5],
+            normalizers=[1, 2]
+        )

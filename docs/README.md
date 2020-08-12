@@ -64,6 +64,34 @@ The following output shows one print.
 ...
 ```
 
+### Dataset(reader: AbstractReader)
+
+#### dataset.window(size, shift=None, stride=1) -> self
+
+Defines the window size, shift and stride
+
+#### dataset.batch(batch) -> self
+
+Defines batch size
+
+#### dataset.get() -> Optional[np.ndarray]
+
+Get the data of the next batch
+
+#### dataset.reset() -> None
+
+Reset reader position
+
+### CsvReader(filepath, dtype, indexes, **kwargs)
+
+- **filepath** `str` absolute path of the csv file
+- **dtype** `Callable` data type. We should only use `float` or `int` for this argument.
+- **indexes** `List[int]` column indexes to pick from the lines of the csv file
+- **kwargs**
+    - **header** `bool = False` whether we should skip reading the header line.
+    - **splitter** `str = ','` the column splitter of the csv file
+    - **normalizer** `List[NormalizerProtocol]` list of normalizer to normalize each column of data. A `NormalizerProtocol` should contains two methods, `normalize(float) -> float` to normalize the given datum and `restore(float) -> float` to restore the normalized datum.
+
 ## License
 
 [MIT](LICENSE)

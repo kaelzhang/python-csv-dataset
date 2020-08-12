@@ -13,22 +13,13 @@ from common_decorators import lazy
 from .reader import AbstractReader
 from .common import rolling_window
 
-
-# Mapper = Callable[[list], list]
-
 T = TypeVar('T')
-
-
-# def default_mapper(lst: list):
-#     return np.array(lst)
 
 
 class Dataset(Generic[T]):
     def __init__(
         self,
-        reader: AbstractReader[T],
-        # column_types: List[Callable],
-        # header: bool = False
+        reader: AbstractReader[T]
     ):
         self._reader = reader
         # self._header = header
@@ -42,6 +33,11 @@ class Dataset(Generic[T]):
         self._window_shift = 1
         self._window_stride = 1
         self._window_drop_remainder = False
+
+    def reset(self) -> None:
+        self._line_pointer = 0
+        self._reader.reset()
+        self._buffer = self._init_buffer()
 
     # |-------- size:3 --------|
     # |- stride:1 -|           |
@@ -76,19 +72,11 @@ class Dataset(Generic[T]):
         return self._batch * self._single_step
 
     @lazy
-    def _buffer(self) -> List[List[T]]:
+    def _buffer(self):
+        return self._init_buffer()
+
+    def _init_buffer(self) -> List[List[T]]:
         return self._readlines(self._least, [])
-
-    # def map_series(
-    #     self,
-    #     mapper: Mapper
-    # ) -> 'Dataset':
-    #     """Maps `mapper` across each series record of the csv
-    #     """
-
-    #     self._mapper = mapper
-
-    #     return self
 
     def _check_start(self, method_name: str):
         if self._line_pointer != 0:
@@ -123,6 +111,12 @@ class Dataset(Generic[T]):
         self._batch = batch
 
         return self
+
+    # def restore(
+    #     self,
+    #     data: np.ndarray
+    # ) -> np.ndarray:
+    #     ...
 
     def _readlines(
         self,

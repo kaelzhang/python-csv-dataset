@@ -152,3 +152,19 @@ def test_reader_error():
             indexes=[1, 2, 3, 4, 5],
             normalizers=[1, 2]
         )
+
+
+def test_max_lines():
+    data = Dataset(
+        CsvReader(
+            csv_path.absolute(),
+            float,
+            [
+                2, 3, 4, 5, 6
+            ],
+            header=True,
+            max_lines=5
+        )
+    )
+
+    assert len(list(data)) == 4

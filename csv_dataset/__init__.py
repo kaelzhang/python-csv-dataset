@@ -1,5 +1,5 @@
 # The first alpha version
-__version__ = '0.1.0'
+__version__ = '0.2.0'
 
 from .reader import (
     AbstractReader,

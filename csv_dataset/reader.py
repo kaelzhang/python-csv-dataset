@@ -42,13 +42,17 @@ class CsvReader(AbstractReader[T]):
         indexes: List[int],
         header: bool = False,
         splitter: str = SPLITTER,
-        normalizers: List[NormalizerProtocol] = []
+        normalizers: List[NormalizerProtocol] = [],
+        max_lines: int = -1
     ):
         self.dtype = dtype
         self._splitter = splitter
         self._indexes = indexes
         self._filepath = filepath
         self._normalizers = normalizers
+        self._max_lines = max_lines
+
+        self._read = 0
 
         if normalizers and len(normalizers) != len(indexes):
             raise ValueError(
@@ -63,6 +67,7 @@ class CsvReader(AbstractReader[T]):
         return open(self._filepath, 'r')
 
     def reset(self) -> None:
+        self._read = 0
         self._fd.seek(0)
 
     def _readline(self) -> str:
@@ -81,7 +86,11 @@ class CsvReader(AbstractReader[T]):
         ]
 
     def readline(self) -> Optional[List[T]]:
+        if self._read == self._max_lines:
+            return
+
         line = self._readline()
+        self._read += 1
 
         if not line:
             return

@@ -91,6 +91,7 @@ Reset reader position
     - **header** `bool = False` whether we should skip reading the header line.
     - **splitter** `str = ','` the column splitter of the csv file
     - **normalizer** `List[NormalizerProtocol]` list of normalizer to normalize each column of data. A `NormalizerProtocol` should contains two methods, `normalize(float) -> float` to normalize the given datum and `restore(float) -> float` to restore the normalized datum.
+    - **max_lines** `int = -1` max lines of the csv file to be read. Defaults to `-1` which means no limit.
 
 ## License
 

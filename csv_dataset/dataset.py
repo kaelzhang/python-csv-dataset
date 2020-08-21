@@ -22,9 +22,7 @@ class Dataset(Generic[T]):
         reader: AbstractReader[T]
     ):
         self._reader = reader
-        # self._header = header
-        # self._column_types = column_types
-        self._line_pointer = 0
+        self._buffer_read = False
 
         # self._mapper = default_mapper
         self._batch = 1
@@ -35,7 +33,6 @@ class Dataset(Generic[T]):
         self._window_drop_remainder = False
 
     def reset(self) -> None:
-        self._line_pointer = 0
         self._reader.reset()
         self._buffer = self._init_buffer()
 
@@ -76,10 +73,11 @@ class Dataset(Generic[T]):
         return self._init_buffer()
 
     def _init_buffer(self) -> List[List[T]]:
+        self._buffer_read = True
         return self._readlines(self._least, [])
 
     def _check_start(self, method_name: str):
-        if self._line_pointer != 0:
+        if self._buffer_read:
             raise RuntimeError(f'calling {method_name}() during reading is forbidden')
 
     def window(
@@ -134,7 +132,6 @@ class Dataset(Generic[T]):
                 return []
 
             dest_buffer.append(line)
-            self._line_pointer += 1
             read += 1
 
         if slice_size:

@@ -140,6 +140,11 @@ def test_reader_with_normalizers():
     assert format(got[0][0], '.6f') == '0.714599'
     assert format(got[1][0], '.6f') == '0.714289'
 
+    assert format(
+        price_normalizer.restore(got[0][0]),
+        '.2f'
+    ) == '7145.99'
+
 
 def test_reader_error():
     with pytest.raises(

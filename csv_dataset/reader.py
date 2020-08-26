@@ -51,24 +51,35 @@ class CsvReader(AbstractReader[T]):
         self._filepath = filepath
         self._normalizers = normalizers
         self._max_lines = max_lines
-
-        self._read = 0
+        self._header = header
 
         if normalizers and len(normalizers) != len(indexes):
             raise ValueError(
                 f'normalizers has different length with indexes, expect {len(indexes)} but got {len(normalizers)}'
             )
 
-        if header:
-            self._readline()
+        self.reset()
 
     @lazy
     def _fd(self):
         return open(self._filepath, 'r')
 
+    @property
+    def line(self) -> int:
+        return self._line
+
+    def max_lines(self, max_lines: int) -> None:
+        """Set the max_lines of the reader
+        """
+
+        self._max_lines = max_lines
+
     def reset(self) -> None:
-        self._read = 0
+        self._line = 0
         self._fd.seek(0)
+
+        if self._header:
+            self._readline()
 
     def _readline(self) -> str:
         return self._fd.readline().strip()
@@ -86,11 +97,11 @@ class CsvReader(AbstractReader[T]):
         ]
 
     def readline(self) -> Optional[List[T]]:
-        if self._read == self._max_lines:
+        if self._line == self._max_lines:
             return
 
         line = self._readline()
-        self._read += 1
+        self._line += 1
 
         if not line:
             return

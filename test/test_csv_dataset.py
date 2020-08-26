@@ -42,16 +42,18 @@ def test_window_and_batch():
 
 
 def test_iterator():
-    dataset = Dataset(
-        CsvReader(
-            csv_path.absolute(),
-            float,
-            [
-                2, 3, 4, 5, 6
-            ],
-            header=True
-        )
-    ).window(5, 1).batch(5)
+    reader = CsvReader(
+        csv_path.absolute(),
+        float,
+        [
+            2, 3, 4, 5, 6
+        ],
+        header=True
+    )
+
+    dataset = Dataset(reader).window(5, 1).batch(5)
+
+    assert reader.line == 0
 
     assert len(list(dataset)) == 19
 
@@ -160,16 +162,21 @@ def test_reader_error():
 
 
 def test_max_lines():
-    data = Dataset(
-        CsvReader(
-            csv_path.absolute(),
-            float,
-            [
-                2, 3, 4, 5, 6
-            ],
-            header=True,
-            max_lines=5
-        )
+    reader = CsvReader(
+        csv_path.absolute(),
+        float,
+        [
+            2, 3, 4, 5, 6
+        ],
+        header=True,
+        max_lines=5
     )
 
+    data = Dataset(reader)
+
     assert len(list(data)) == 4
+
+    reader.max_lines(1)
+    data.reset()
+
+    assert len(list(data)) == 1

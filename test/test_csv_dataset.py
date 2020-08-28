@@ -53,7 +53,7 @@ def test_iterator():
 
     dataset = Dataset(reader).window(5, 1).batch(5)
 
-    assert reader.line == 0
+    assert reader.lines == 0
 
     assert len(list(dataset)) == 19
 

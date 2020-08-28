@@ -65,8 +65,8 @@ class CsvReader(AbstractReader[T]):
         return open(self._filepath, 'r')
 
     @property
-    def line(self) -> int:
-        return self._line
+    def lines(self) -> int:
+        return self._lines
 
     def max_lines(self, max_lines: int) -> None:
         """Set the max_lines of the reader
@@ -75,7 +75,7 @@ class CsvReader(AbstractReader[T]):
         self._max_lines = max_lines
 
     def seek(self, pos: int) -> None:
-        self._line = pos
+        self._lines = pos
         self._fd.seek(pos)
 
         if pos == 0 and self._header:
@@ -100,11 +100,11 @@ class CsvReader(AbstractReader[T]):
         ]
 
     def readline(self) -> Optional[List[T]]:
-        if self._line == self._max_lines:
+        if self._lines == self._max_lines:
             return
 
         line = self._readline()
-        self._line += 1
+        self._lines += 1
 
         if not line:
             return

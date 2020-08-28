@@ -95,11 +95,23 @@ Reset reader position
 
 #### csvReader.seek(pos: int)
 
+Sets the reader pos to `pos`
+
 #### csvReader.reset()
 
-#### csvReader.max_lines()
+Resets the reader pos, which equivalent to `csvReader.seek(0)`
+
+#### csvReader.max_lines(lines: int)
+
+Changes max_lines
 
 #### csvReader.readline() -> list
+
+Returns the converted value of the next line
+
+#### property csvReader.lines
+
+How many lines the reader has been read
 
 ## License
 

@@ -74,12 +74,15 @@ class CsvReader(AbstractReader[T]):
 
         self._max_lines = max_lines
 
-    def reset(self) -> None:
-        self._line = 0
-        self._fd.seek(0)
+    def seek(self, pos: int) -> None:
+        self._line = pos
+        self._fd.seek(pos)
 
-        if self._header:
+        if pos == 0 and self._header:
             self._readline()
+
+    def reset(self) -> None:
+        self.seek(0)
 
     def _readline(self) -> str:
         return self._fd.readline().strip()

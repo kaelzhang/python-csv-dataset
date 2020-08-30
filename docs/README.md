@@ -78,7 +78,7 @@ Defines batch size
 
 Get the data of the next batch
 
-#### dataset.reset() -> None
+#### dataset.reset(pos: int = 0) -> None
 
 Reset reader position
 
@@ -96,10 +96,6 @@ Reset reader position
 #### csvReader.seek(pos: int)
 
 Sets the reader pos to `pos`
-
-#### csvReader.reset()
-
-Resets the reader pos, which equivalent to `csvReader.seek(0)`
 
 #### csvReader.max_lines(lines: int)
 

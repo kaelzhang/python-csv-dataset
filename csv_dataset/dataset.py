@@ -32,8 +32,8 @@ class Dataset(Generic[T]):
         self._window_stride = 1
         self._window_drop_remainder = False
 
-    def reset(self) -> None:
-        self._reader.reset()
+    def reset(self, pos: int = 0) -> None:
+        self._reader.seek(pos)
         self._buffer = self._init_buffer()
 
     # |-------- size:3 --------|

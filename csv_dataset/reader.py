@@ -58,7 +58,7 @@ class CsvReader(AbstractReader[T]):
                 f'normalizers has different length with indexes, expect {len(indexes)} but got {len(normalizers)}'
             )
 
-        self.reset()
+        self.seek(0)
 
     @lazy
     def _fd(self):
@@ -80,9 +80,6 @@ class CsvReader(AbstractReader[T]):
 
         if pos == 0 and self._header:
             self._readline()
-
-    def reset(self) -> None:
-        self.seek(0)
 
     def _readline(self) -> str:
         return self._fd.readline().strip()

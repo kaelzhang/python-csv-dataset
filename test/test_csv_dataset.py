@@ -219,6 +219,6 @@ def test_read():
 
     assert data.get()[0][0] == 7145.99
 
-    array = data.read(4, reset_window=True)
+    array = data.read(4, reset_buffer=True)
     assert len(array) == 4
     assert array[0][0][0] == 7125.76

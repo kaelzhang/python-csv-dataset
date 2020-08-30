@@ -66,21 +66,28 @@ The following output shows one print.
 
 ### Dataset(reader: AbstractReader)
 
-#### dataset.window(size, shift=None, stride=1) -> self
+#### dataset.window(size: int, shift: int = None, stride: int = 1) -> self
 
 Defines the window size, shift and stride
 
-#### dataset.batch(batch) -> self
+#### dataset.batch(batch: int) -> self
 
 Defines batch size
 
 #### dataset.get() -> Optional[np.ndarray]
 
-Get the data of the next batch
+Gets the data of the next batch
 
-#### dataset.reset(pos: int = 0) -> None
+#### dataset.reset() -> None
 
-Reset reader position
+Reset dataset
+
+#### dataset.read(amount: int, reset_buffer: bool = False)
+
+- **amount** the maximum length of data the dataset will read
+- **reset_buffer** if `True`, the dataset will reset the data of the previous window in the buffer
+
+Reads multiple batches at a time
 
 ### CsvReader(filepath, dtype, indexes, **kwargs)
 
@@ -93,7 +100,7 @@ Reset reader position
     - **normalizer** `List[NormalizerProtocol]` list of normalizer to normalize each column of data. A `NormalizerProtocol` should contains two methods, `normalize(float) -> float` to normalize the given datum and `restore(float) -> float` to restore the normalized datum.
     - **max_lines** `int = -1` max lines of the csv file to be read. Defaults to `-1` which means no limit.
 
-#### csvReader.seek(pos: int)
+#### csvReader.reset()
 
 Sets the reader pos to `pos`
 

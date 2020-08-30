@@ -1,7 +1,5 @@
 from typing import (
     Optional,
-    # Callable,
-    List,
     TypeVar,
     Generic
 )
@@ -24,7 +22,6 @@ class Dataset(Generic[T]):
         self._reader = reader
         self._buffer_read = False
 
-        # self._mapper = default_mapper
         self._batch = 1
 
         self._window_size = 1
@@ -32,10 +29,11 @@ class Dataset(Generic[T]):
         self._window_stride = 1
         self._window_drop_remainder = False
 
-        self._buffer = None
+        self.reset()
 
     def reset(self) -> None:
         self._reader.reset()
+        self._buffer = None
 
     # |-------- size:3 --------|
     # |- stride:1 -|           |
@@ -68,10 +66,6 @@ class Dataset(Generic[T]):
     @lazy
     def _step(self) -> int:
         return self._batch * self._single_step
-
-    def _init_buffer(self) -> List[List[T]]:
-        self._buffer_read = True
-        return self._readlines(self._least, [])
 
     def _check_start(self, method_name: str):
         if self._buffer_read:
@@ -136,22 +130,24 @@ class Dataset(Generic[T]):
 
         return dest_buffer
 
-    def _get_buffer(self):
-        if self._buffer is not None:
-            self._buffer = self._readlines(self._step, self._buffer, True)
+    def _read_buffer(self):
+        if self._buffer is None:
+            # Initialize buffer
+            self._buffer_read = True
+            self._buffer = self._readlines(self._least, [])
         else:
-            self._buffer = self._init_buffer()
-
-        return self._buffer
+            # Extend buffer
+            self._buffer = self._readlines(self._step, self._buffer, True)
 
     def get(self) -> Optional[np.ndarray]:
-        buffer = self._get_buffer()
+        self._read_buffer()
 
-        if not buffer:
-            # There is no data
+        if not self._buffer:
+            # There is no data,
+            # which indicates that the data has been exhausted
             return
 
-        array = np.array(buffer)
+        array = np.array(self._buffer)
 
         windowed = array if self._window_size == 1 else rolling_window(
             array,
@@ -170,9 +166,9 @@ class Dataset(Generic[T]):
     def read(
         self,
         amount: int,
-        reset_window: bool = False
+        reset_buffer: bool = False
     ) -> list:
-        if reset_window:
+        if reset_buffer:
             self._buffer = None
 
         array = []

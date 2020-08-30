@@ -140,6 +140,9 @@ class Dataset(Generic[T]):
             self._buffer = self._readlines(self._step, self._buffer, True)
 
     def get(self) -> Optional[np.ndarray]:
+        """Gets the data of the next batch
+        """
+
         self._read_buffer()
 
         if not self._buffer:
@@ -168,6 +171,13 @@ class Dataset(Generic[T]):
         amount: int,
         reset_buffer: bool = False
     ) -> list:
+        """Reads multiple batches of data
+
+        Args:
+            amount (int): number of batches to be read
+            reset_buffer (:obj:`bool`, optional): if `True`, the dataset will reset the data of the previous window in the buffer
+        """
+
         if reset_buffer:
             self._buffer = None
 

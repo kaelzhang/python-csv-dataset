@@ -68,11 +68,15 @@ The following output shows one print.
 
 #### dataset.window(size: int, shift: int = None, stride: int = 1) -> self
 
-Defines the window size, shift and stride
+Defines the window size, shift and stride.
+
+The default window size is `1` which means the dataset has no window.
 
 #### dataset.batch(batch: int) -> self
 
-Defines batch size
+Defines batch size.
+
+The default batch size of the dataset is `1` which means it is single-batch
 
 #### dataset.get() -> Optional[np.ndarray]
 
@@ -80,7 +84,7 @@ Gets the data of the next batch
 
 #### dataset.reset() -> None
 
-Reset dataset
+Resets dataset
 
 #### dataset.read(amount: int, reset_buffer: bool = False)
 
@@ -102,7 +106,7 @@ Reads multiple batches at a time
 
 #### csvReader.reset()
 
-Sets the reader pos to `pos`
+Resets reader pos
 
 #### csvReader.max_lines(lines: int)
 

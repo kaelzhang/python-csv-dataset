@@ -116,6 +116,10 @@ Changes `max_lines`
 
 Returns the converted value of the next line
 
+#### property csvReader.lines
+
+Returns number of lines has been read
+
 ## License
 
 [MIT](LICENSE)

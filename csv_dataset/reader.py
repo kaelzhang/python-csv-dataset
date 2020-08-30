@@ -35,6 +35,11 @@ class AbstractReader(ABC, Generic[T]):
         """
         ...  # pragma: no cover
 
+    @property
+    @abstractmethod
+    def lines(self) -> int:
+        ...  # pragma: no cover
+
 
 class CsvReader(AbstractReader[T]):
     def __init__(
@@ -62,6 +67,10 @@ class CsvReader(AbstractReader[T]):
             )
 
         self.reset()
+
+    @property
+    def lines(self) -> int:
+        return self._lines
 
     @lazy
     def _fd(self) -> TextIO:

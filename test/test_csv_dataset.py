@@ -209,9 +209,13 @@ def test_read():
 
     assert data.get()[0][0] == 7145.99
 
+    assert reader.lines == 2
+
     array = data.read(4)
     assert len(array) == 4
     assert array[0][0][0] == 7142.89
+
+    assert reader.lines == 6
 
     # reset
 
@@ -222,3 +226,5 @@ def test_read():
     array = data.read(4, reset_buffer=True)
     assert len(array) == 4
     assert array[0][0][0] == 7125.76
+
+    assert reader.lines == 7

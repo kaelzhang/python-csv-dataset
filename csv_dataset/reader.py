@@ -3,7 +3,8 @@ from typing import (
     Generic,
     TypeVar,
     Type,
-    Optional
+    Optional,
+    TextIO
 )
 from abc import (
     ABC,
@@ -28,8 +29,9 @@ class AbstractReader(ABC, Generic[T]):
         """
         ...  # pragma: no cover
 
+    @abstractmethod
     def reset(self) -> None:
-        """Reset the read position
+        """Reset the reader pos
         """
         ...  # pragma: no cover
 
@@ -50,36 +52,37 @@ class CsvReader(AbstractReader[T]):
         self._indexes = indexes
         self._filepath = filepath
         self._normalizers = normalizers
-        self._max_lines = max_lines
         self._header = header
+
+        self.max_lines(max_lines)
 
         if normalizers and len(normalizers) != len(indexes):
             raise ValueError(
                 f'normalizers has different length with indexes, expect {len(indexes)} but got {len(normalizers)}'
             )
 
-        self.seek(0)
+        self.reset()
 
     @lazy
-    def _fd(self):
+    def _fd(self) -> TextIO:
         return open(self._filepath, 'r')
 
-    @property
-    def lines(self) -> int:
-        return self._lines
+    def reset(self) -> None:
+        self._lines = 0
+        self._fd.seek(0)
+
+        if self._header:
+            self._readline()
 
     def max_lines(self, max_lines: int) -> None:
         """Set the max_lines of the reader
         """
 
+        if max_lines < -1 or max_lines == 0:
+            raise ValueError(
+                f'max_lines must be -1 or postivie, but got `{max_lines}`')
+
         self._max_lines = max_lines
-
-    def seek(self, pos: int) -> None:
-        self._lines = pos
-        self._fd.seek(pos)
-
-        if pos == 0 and self._header:
-            self._readline()
 
     def _readline(self) -> str:
         return self._fd.readline().strip()
@@ -101,7 +104,6 @@ class CsvReader(AbstractReader[T]):
             return
 
         line = self._readline()
-        self._lines += 1
 
         if not line:
             return
@@ -116,5 +118,7 @@ class CsvReader(AbstractReader[T]):
             ]
         except ValueError:
             return self.readline()
+
+        self._lines += 1
 
         return self._normalize(line)

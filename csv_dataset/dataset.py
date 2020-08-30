@@ -32,9 +32,10 @@ class Dataset(Generic[T]):
         self._window_stride = 1
         self._window_drop_remainder = False
 
-    def reset(self, pos: int = 0) -> None:
-        self._reader.seek(pos)
-        self._buffer = self._init_buffer()
+        self._buffer = None
+
+    def reset(self) -> None:
+        self._reader.reset()
 
     # |-------- size:3 --------|
     # |- stride:1 -|           |
@@ -67,10 +68,6 @@ class Dataset(Generic[T]):
     @lazy
     def _step(self) -> int:
         return self._batch * self._single_step
-
-    @lazy
-    def _buffer(self):
-        return self._init_buffer()
 
     def _init_buffer(self) -> List[List[T]]:
         self._buffer_read = True
@@ -139,8 +136,16 @@ class Dataset(Generic[T]):
 
         return dest_buffer
 
+    def _get_buffer(self):
+        if self._buffer is not None:
+            self._buffer = self._readlines(self._step, self._buffer, True)
+        else:
+            self._buffer = self._init_buffer()
+
+        return self._buffer
+
     def get(self) -> Optional[np.ndarray]:
-        buffer = self._buffer
+        buffer = self._get_buffer()
 
         if not buffer:
             # There is no data
@@ -160,9 +165,23 @@ class Dataset(Generic[T]):
             self._batch
         )
 
-        self._buffer = self._readlines(self._step, buffer, True)
-
         return batched[0]
+
+    def read(
+        self,
+        amount: int,
+        reset_window: bool = False
+    ) -> list:
+        if reset_window:
+            self._buffer = None
+
+        array = []
+
+        while amount > 0:
+            amount -= 1
+            array.append(self.get())
+
+        return array
 
     def __iter__(self) -> 'Dataset':
         return self

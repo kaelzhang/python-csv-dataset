@@ -11,6 +11,21 @@ csv_path = Path(Path(__file__).resolve()).parent.parent / \
     'example' / 'stock.csv'
 
 
+def test_reader_exception():
+    with pytest.raises(
+        ValueError,
+        match='-1'
+    ):
+        CsvReader(
+            csv_path.absolute(),
+            float,
+            [
+                2, 3, 4, 5, 6
+            ],
+            max_lines=0
+        )
+
+
 def test_window_and_batch():
     dataset = Dataset(
         CsvReader(
@@ -42,18 +57,16 @@ def test_window_and_batch():
 
 
 def test_iterator():
-    reader = CsvReader(
-        csv_path.absolute(),
-        float,
-        [
-            2, 3, 4, 5, 6
-        ],
-        header=True
-    )
-
-    dataset = Dataset(reader).window(5, 1).batch(5)
-
-    assert reader.lines == 0
+    dataset = Dataset(
+        CsvReader(
+            csv_path.absolute(),
+            float,
+            [
+                2, 3, 4, 5, 6
+            ],
+            header=True
+        )
+    ).window(5, 1).batch(5)
 
     assert len(list(dataset)) == 19
 
@@ -174,9 +187,38 @@ def test_max_lines():
 
     data = Dataset(reader)
 
-    assert len(list(data)) == 4
+    assert len(list(data)) == 5
 
     reader.max_lines(1)
     data.reset()
 
     assert len(list(data)) == 1
+
+
+def test_read():
+    reader = CsvReader(
+        csv_path.absolute(),
+        float,
+        [
+            2, 3, 4, 5, 6
+        ],
+        header=True
+    )
+
+    data = Dataset(reader).window(2, shift=1)
+
+    assert data.get()[0][0] == 7145.99
+
+    array = data.read(4)
+    assert len(array) == 4
+    assert array[0][0][0] == 7142.89
+
+    # reset
+
+    data.reset()
+
+    assert data.get()[0][0] == 7145.99
+
+    array = data.read(4, reset_window=True)
+    assert len(array) == 4
+    assert array[0][0][0] == 7125.76

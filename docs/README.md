@@ -99,15 +99,11 @@ Sets the reader pos to `pos`
 
 #### csvReader.max_lines(lines: int)
 
-Changes max_lines
+Changes `max_lines`
 
 #### csvReader.readline() -> list
 
 Returns the converted value of the next line
-
-#### property csvReader.lines
-
-How many lines the reader has been read
 
 ## License
 

@@ -1,5 +1,5 @@
 files = csv_dataset test *.py
-test_files = *
+test_files = csv_dataset
 
 test:
 	pytest -s -v test/test_$(test_files).py --doctest-modules --cov csv_dataset --cov-config=.coveragerc --cov-report term-missing

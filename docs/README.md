@@ -72,6 +72,29 @@ Defines the window size, shift and stride.
 
 The default window size is `1` which means the dataset has no window.
 
+**Parameter explanation**
+
+Suppose we have a raw data set
+
+```
+[ 1  2  3  4  5  6  7  8  9 ... ]
+```
+
+And the following is a window of `(size=4, shift=3, stride=2)`
+
+```
+  |-------------- size:4 --------------|
+  |- stride:2 -|                       |
+  |            |                       |
+[ 1            3           5           7  ] --------|-----
+                                               shift:3
+[ 4            6           8           10 ] --------|-----
+
+[ 7            9           11          13 ]
+
+...
+```
+
 #### dataset.batch(batch: int) -> self
 
 Defines batch size.
@@ -82,7 +105,7 @@ The default batch size of the dataset is `1` which means it is single-batch
 
 Gets the data of the next batch
 
-#### dataset.reset() -> None
+#### dataset.reset() -> self
 
 Resets dataset
 
@@ -92,6 +115,8 @@ Resets dataset
 - **reset_buffer** if `True`, the dataset will reset the data of the previous window in the buffer
 
 Reads multiple batches at a time
+
+If we `reset_buffer`, then the next read will not use existing data in the buffer, and the result will have no overlap with the last read.
 
 ### CsvReader(filepath, dtype, indexes, **kwargs)
 

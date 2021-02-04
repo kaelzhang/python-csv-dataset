@@ -35,6 +35,8 @@ class Dataset(Generic[T]):
         self._reader.reset()
         self._buffer = None
 
+        return self
+
     # |-------- size:3 --------|
     # |- stride:1 -|           |
     # |            |           |
@@ -73,7 +75,7 @@ class Dataset(Generic[T]):
 
     def window(
         self,
-        window_size: int,
+        size: int,
         shift: Optional[int] = None,
         stride: int = 1
     ) -> 'Dataset':
@@ -82,8 +84,8 @@ class Dataset(Generic[T]):
 
         self._check_start('window')
 
-        self._window_size = window_size
-        self._window_shift = shift or window_size
+        self._window_size = size
+        self._window_shift = shift or size
         self._window_stride = stride
 
         return self

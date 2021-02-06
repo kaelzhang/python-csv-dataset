@@ -83,14 +83,14 @@ Suppose we have a raw data set
 And the following is a window of `(size=4, shift=3, stride=2)`
 
 ```
-  |-------------- size:4 --------------|
-  |- stride:2 -|                       |
-  |            |                       |
-[ 1            3           5           7  ] --------|-----
-                                               shift:3
-[ 4            6           8           10 ] --------|-----
+          |-------------- size:4 --------------|
+          |- stride:2 -|                       |
+          |            |                       |
+win 0:  [ 1            3           5           7  ] --------|-----
+                                                       shift:3
+win 1:  [ 4            6           8           10 ] --------|-----
 
-[ 7            9           11          13 ]
+win 2:  [ 7            9           11          13 ]
 
 ...
 ```
@@ -100,6 +100,18 @@ And the following is a window of `(size=4, shift=3, stride=2)`
 Defines batch size.
 
 The default batch size of the dataset is `1` which means it is single-batch
+
+If batch is `2`
+
+```
+batch 0:  [[ 1            3           5           7  ]
+           [ 4            6           8           10 ]]
+
+batch 1:  [[ 7            9           11          13 ]
+           [ 10           12          14          16 ]]
+
+...
+```
 
 #### dataset.get() -> Optional[np.ndarray]
 

@@ -50,24 +50,36 @@ class Dataset(Generic[T]):
     # step : shift * stride
     @lazy
     def _single_least(self) -> int:
-        """The list size of the underlying datum referred to a single window
+        """The least size (lines) of the underlying datum referred to the first single window
         """
 
         return (self._window_size - 1) * self._window_stride + 1
 
     @lazy
-    def _single_step(self) -> int:
+    def _single_stride(self) -> int:
         """stride without considering the batch size
         """
         return self._window_shift * self._window_stride
 
     @lazy
     def _least(self) -> int:
-        return self._single_least + (self._batch - 1) * self._single_step
+        """The least size (lines) of the underlying datum referered to the first batch read
+        """
+
+        return self._single_least + (self._batch - 1) * self._single_stride
 
     @lazy
-    def _step(self) -> int:
-        return self._batch * self._single_step
+    def _stride(self) -> int:
+        """stride that considering window stride and batch size
+        """
+
+        return self._batch * self._single_stride
+
+    def lines_need(self, reads: int) -> int:
+        """Calculate how many lines of datum needed for reading `reads` times
+        """
+
+        return self._least + (reads - 1) * self._stride
 
     def _check_start(self, method_name: str):
         if self._buffer_read:
@@ -103,12 +115,6 @@ class Dataset(Generic[T]):
 
         return self
 
-    # def restore(
-    #     self,
-    #     data: np.ndarray
-    # ) -> np.ndarray:
-    #     ...
-
     def _readlines(
         self,
         lines: int,
@@ -139,7 +145,7 @@ class Dataset(Generic[T]):
             self._buffer = self._readlines(self._least, [])
         else:
             # Extend buffer
-            self._buffer = self._readlines(self._step, self._buffer, True)
+            self._buffer = self._readlines(self._stride, self._buffer, True)
 
     def get(self) -> Optional[np.ndarray]:
         """Gets the data of the next batch

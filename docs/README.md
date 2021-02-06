@@ -130,6 +130,10 @@ Reads multiple batches at a time
 
 If we `reset_buffer`, then the next read will not use existing data in the buffer, and the result will have no overlap with the last read.
 
+#### dataset.lines_need(reads: int) -> int
+
+Calculates and returns how many lines of the underlying datum are needed for reading `reads` times
+
 ### CsvReader(filepath, dtype, indexes, **kwargs)
 
 - **filepath** `str` absolute path of the csv file

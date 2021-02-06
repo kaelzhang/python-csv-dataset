@@ -38,6 +38,8 @@ def test_window_and_batch():
         )
     ).window(5, 1).batch(5)
 
+    assert dataset.lines_need(reads=3) == 19
+
     data = dataset.get()
 
     with pytest.raises(

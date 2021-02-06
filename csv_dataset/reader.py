@@ -24,20 +24,20 @@ class AbstractReader(ABC, Generic[T]):
     dtype: Type[T]
 
     @abstractmethod
-    def readline(self) -> List[T]:
+    def readline(_) -> List[T]:
         """Reads a single line and returns the content
         """
         ...  # pragma: no cover
 
     @abstractmethod
-    def reset(self) -> None:
+    def reset(_) -> None:
         """Reset the reader pos
         """
         ...  # pragma: no cover
 
     @property
     @abstractmethod
-    def lines(self) -> int:
+    def lines(_) -> int:
         ...  # pragma: no cover
 
 
@@ -70,10 +70,22 @@ class CsvReader(AbstractReader[T]):
 
     @property
     def lines(self) -> int:
+        """How many lines the reader has read
+        """
+
         return self._lines
+
+    # @property
+    # def pos(self) -> int:
+    #     """The stream position of the reader
+    #     """
+
+    #     return self._pos
 
     @lazy
     def _fd(self) -> TextIO:
+        # Ref
+        # https://docs.python.org/3/library/io.html
         return open(self._filepath, 'r')
 
     def reset(self) -> None:
@@ -113,6 +125,7 @@ class CsvReader(AbstractReader[T]):
             return
 
         line = self._readline()
+        # self._pos = self._fd.tell()
 
         if not line:
             return

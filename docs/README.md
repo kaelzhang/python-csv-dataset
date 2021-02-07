@@ -134,6 +134,16 @@ If we `reset_buffer`, then the next read will not use existing data in the buffe
 
 Calculates and returns how many lines of the underlying datum are needed for reading `reads` times
 
+#### dataset.max_reads(max_lines: int) -> int | None
+
+Calculates `max_lines` lines could afford how many reads
+
+#### dataset.max_reads() -> int | None
+
+Calculates the current reader could afford how many reads.
+
+If `max_lines` of current reader is unset, then it returns `None`
+
 ### CsvReader(filepath, dtype, indexes, **kwargs)
 
 - **filepath** `str` absolute path of the csv file

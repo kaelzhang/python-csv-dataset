@@ -14,7 +14,7 @@ csv_path = Path(Path(__file__).resolve()).parent.parent / \
 def test_reader_exception():
     with pytest.raises(
         ValueError,
-        match='-1'
+        match='positive'
     ):
         CsvReader(
             csv_path.absolute(),
@@ -191,7 +191,7 @@ def test_max_lines():
 
     assert len(list(data)) == 5
 
-    reader.max_lines(1)
+    reader.max_lines = 1
     data.reset()
 
     assert len(list(data)) == 1
@@ -206,6 +206,8 @@ def test_read():
         ],
         header=True
     )
+
+    assert reader.max_lines is None
 
     data = Dataset(reader).window(2, shift=1)
 
@@ -230,3 +232,25 @@ def test_read():
     assert array[0][0][0] == 7125.76
 
     assert reader.lines == 7
+
+
+def test_max_reads():
+    reader = CsvReader(
+        csv_path.absolute(),
+        float,
+        [
+            2, 3, 4, 5, 6
+        ],
+        header=True
+    )
+
+    data = Dataset(reader).window(2, shift=1)
+
+    assert data.max_reads() is None
+
+    with pytest.raises(ValueError, match='positive'):
+        data.max_reads(-1)
+
+    assert data.max_reads(1) == 0
+    assert data.max_reads(2) == 1
+    assert data.max_reads(3) == 2

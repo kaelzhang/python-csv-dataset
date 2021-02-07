@@ -9,12 +9,17 @@ import numpy as np
 from common_decorators import lazy
 
 from .reader import AbstractReader
-from .common import rolling_window
+from .common import (
+    rolling_window,
+    max_lines_error
+)
 
 T = TypeVar('T')
 
 
 class Dataset(Generic[T]):
+    _reader: AbstractReader[T]
+
     def __init__(
         self,
         reader: AbstractReader[T]
@@ -80,6 +85,30 @@ class Dataset(Generic[T]):
         """
 
         return self._least + (reads - 1) * self._stride
+
+    def max_reads(self, max_lines: Optional[int] = None) -> Optional[int]:
+        """How many reads does the current dataset afford
+
+        Args:
+            max_lines (:obj:`int`, optional)
+
+        Returns:
+            - None which indicates the dataset could not know about it. If max_lines is not provided, and the reader has no max_lines
+            - int otherwise
+        """
+
+        if max_lines is None:
+            max_lines = self._reader.max_lines
+
+        if max_lines is None:
+            return None
+
+        if max_lines <= 0:
+            raise max_lines_error(max_lines)
+
+        rest = max_lines - self._least
+
+        return 0 if rest < 0 else 1 + rest // self._stride
 
     def _check_start(self, method_name: str):
         if self._buffer_read:

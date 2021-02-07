@@ -48,3 +48,9 @@ def rolling_window(
     )
 
     return ret
+
+
+def max_lines_error(max_lines):
+    return ValueError(
+        f'max_lines must be positive, but got `{max_lines}`'
+    )

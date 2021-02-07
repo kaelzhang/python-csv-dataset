@@ -14,6 +14,7 @@ from abc import (
 from common_decorators import lazy
 
 from .normalizer import NormalizerProtocol
+from .common import max_lines_error
 
 
 SPLITTER = ','
@@ -22,6 +23,23 @@ T = TypeVar('T', float, int)
 
 class AbstractReader(ABC, Generic[T]):
     dtype: Type[T]
+
+    _max_lines: Optional[int]
+    _max_lines = None
+
+    @property
+    def max_lines(self) -> Optional[int]:
+        return self._max_lines
+
+    @max_lines.setter
+    def max_lines(self, max_lines: Optional[int]) -> None:
+        self._set_max_lines(max_lines)
+
+    @abstractmethod
+    def _set_max_lines(self, max_lines: Optional[int]) -> None:
+        """Sets the value of max_lines
+        """
+        ...  # pragma: no cover
 
     @abstractmethod
     def readline(_) -> List[T]:
@@ -50,7 +68,7 @@ class CsvReader(AbstractReader[T]):
         header: bool = False,
         splitter: str = SPLITTER,
         normalizers: List[NormalizerProtocol] = [],
-        max_lines: int = -1
+        max_lines: Optional[int] = None
     ):
         self.dtype = dtype
         self._splitter = splitter
@@ -59,7 +77,7 @@ class CsvReader(AbstractReader[T]):
         self._normalizers = normalizers
         self._header = header
 
-        self.max_lines(max_lines)
+        self.max_lines = max_lines
 
         if normalizers and len(normalizers) != len(indexes):
             raise ValueError(
@@ -95,13 +113,19 @@ class CsvReader(AbstractReader[T]):
         if self._header:
             self._readline()
 
-    def max_lines(self, max_lines: int) -> None:
+    def _set_max_lines(self, max_lines: Optional[int]) -> None:
         """Set the max_lines of the reader
+
+        Args:
+            max_lines (int | None): if None, it indicates where is no limit
         """
 
-        if max_lines < -1 or max_lines == 0:
-            raise ValueError(
-                f'max_lines must be -1 or postivie, but got `{max_lines}`')
+        if max_lines is None:
+            self._max_lines = None
+            return
+
+        if max_lines <= 0:
+            raise max_lines_error(max_lines)
 
         self._max_lines = max_lines
 

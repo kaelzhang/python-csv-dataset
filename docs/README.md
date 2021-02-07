@@ -155,19 +155,23 @@ If `max_lines` of current reader is unset, then it returns `None`
     - **normalizer** `List[NormalizerProtocol]` list of normalizer to normalize each column of data. A `NormalizerProtocol` should contains two methods, `normalize(float) -> float` to normalize the given datum and `restore(float) -> float` to restore the normalized datum.
     - **max_lines** `int = -1` max lines of the csv file to be read. Defaults to `-1` which means no limit.
 
-#### csvReader.reset()
+#### reader.reset()
 
 Resets reader pos
 
-#### csvReader.max_lines(lines: int)
+#### property reader.max_lines
+
+Gets `max_lines`
+
+#### setter reader.max_lines = lines
 
 Changes `max_lines`
 
-#### csvReader.readline() -> list
+#### reader.readline() -> list
 
 Returns the converted value of the next line
 
-#### property csvReader.lines
+#### reader csvReader.lines
 
 Returns number of lines has been read
 

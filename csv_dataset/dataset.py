@@ -203,6 +203,9 @@ class Dataset(Generic[T]):
 
         return batched[0]
 
+    def reset_buffer(self) -> None:
+        self._buffer = None
+
     def read(
         self,
         amount: int,
@@ -216,7 +219,7 @@ class Dataset(Generic[T]):
         """
 
         if reset_buffer:
-            self._buffer = None
+            self.reset_buffer()
 
         array = []
 

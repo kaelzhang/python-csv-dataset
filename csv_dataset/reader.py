@@ -35,11 +35,21 @@ class AbstractReader(ABC, Generic[T]):
     def max_lines(self, max_lines: Optional[int]) -> None:
         self._set_max_lines(max_lines)
 
-    @abstractmethod
     def _set_max_lines(self, max_lines: Optional[int]) -> None:
-        """Sets the value of max_lines
+        """Set the max_lines of the reader
+
+        Args:
+            max_lines (int | None): if None, it indicates where is no limit
         """
-        ...  # pragma: no cover
+
+        if max_lines is None:
+            self._max_lines = None
+            return
+
+        if max_lines <= 0:
+            raise max_lines_error(max_lines)
+
+        self._max_lines = max_lines
 
     @abstractmethod
     def readline(_) -> List[T]:
@@ -51,11 +61,6 @@ class AbstractReader(ABC, Generic[T]):
     def reset(_) -> None:
         """Reset the reader pos
         """
-        ...  # pragma: no cover
-
-    @property
-    @abstractmethod
-    def lines(_) -> int:
         ...  # pragma: no cover
 
 
@@ -112,22 +117,6 @@ class CsvReader(AbstractReader[T]):
 
         if self._header:
             self._readline()
-
-    def _set_max_lines(self, max_lines: Optional[int]) -> None:
-        """Set the max_lines of the reader
-
-        Args:
-            max_lines (int | None): if None, it indicates where is no limit
-        """
-
-        if max_lines is None:
-            self._max_lines = None
-            return
-
-        if max_lines <= 0:
-            raise max_lines_error(max_lines)
-
-        self._max_lines = max_lines
 
     def _readline(self) -> str:
         return self._fd.readline().strip()

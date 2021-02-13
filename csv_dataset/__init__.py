@@ -1,4 +1,4 @@
-__version__ = '3.4.0'
+__version__ = '3.5.0'
 
 from .reader import (
     AbstractReader,
@@ -6,5 +6,6 @@ from .reader import (
 )
 from .dataset import Dataset
 from .normalizer import (
-    RangeNormalizer
+    RangeNormalizer,
+    NormalizerProtocol
 )
